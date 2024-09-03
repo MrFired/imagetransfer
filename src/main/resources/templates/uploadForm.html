@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="ru">
+<div th:replace="~{fragments/head :: head}"></div>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="mx-auto pt-3 px-3" style="max-width: 800px;">
+    <div th:class="'alert alert-dismissible text-break fade show alert-' + ${status} " role="alert" th:if="${status}">
+        [[${message}]]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+    </div>
+
+    <form method="POST" th:action="@{/upload}" enctype="multipart/form-data" action="/">
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Загрузить изображение</label>
+            <input type="file" class="form-control" name="file" accept="image/png, image/jpeg, image/gif" id="formFile"/>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Загрузить"/>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    const uploadField = document.getElementById("formFile");
+
+    uploadField.onchange = function() {
+        if(this.files[0].size > [(${@environment.getProperty('spring.servlet.multipart.max-file-size')})]) {
+           alert("Превышен максимальный допустимый размер файла");
+           this.value = "";
+        }
+    };
+</script>
+
+</body>
+</html>

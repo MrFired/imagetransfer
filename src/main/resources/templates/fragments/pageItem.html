@@ -1,0 +1,4 @@
+<li th:unless="${page < 1} OR ${page > totalPages}" class="page-item" th:classappend="${currentPage == page} ? 'active'"
+    th:fragment="pageItem (page,currentPage,totalPages,pageSize)">
+    <a class="page-link" th:href="@{'/list?page=' + ${page} + '&size=' + ${pageSize}}">[[${page}]]</a>
+</li>

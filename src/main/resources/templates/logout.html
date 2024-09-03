@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+    <div th:replace="~{fragments/head :: head}"></div>
+    <body>
+        <div class="mx-auto pt-3 px-3" style="max-width: 800px;">
+            <h3>Вы уверены, что хотите выйти из аккаунта?</h3>
+
+            <form method="POST" th:action="@{/logout}">
+                <div class="mb-3">
+                    <input class="btn btn-danger" type="submit" value="Выйти"/>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

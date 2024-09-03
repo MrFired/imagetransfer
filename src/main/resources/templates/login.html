@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<div th:replace="~{fragments/head :: head}"></div>
+<body>
+<div class="mx-auto pt-3 px-3" style="max-width: 800px;">
+    <h3>Вход в аккаунт</h3>
+
+    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        Неверное имя пользователя или пароль.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+    </div>
+    <div th:if="${param.logout}" class="alert alert-primary alert-dismissible fade show" role="alert">
+        Вы вышли из аккаунта.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+    </div>
+
+    <form method="POST" th:action="@{/login}">
+        <div class="mb-3">
+            <input type="text" class="form-control" name="username" placeholder="Имя пользователя"/>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" name="password" placeholder="Пароль"/>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Войти"/>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+services:
+  nginx:
+    image: nginx:1.27
+    depends_on:
+      - app
+    volumes:
+      - ${NGINX_CONFIG_FILE}:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+    restart: always
+  app:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM amazoncorretto:21.0.3
+        COPY ${APPLICATION_FILE} app.jar
+        ENTRYPOINT ["java", "-jar", "/app.jar"]
+    depends_on:
+      - db
+    environment:
+      AWS_ACCESS_KEY_ID_FILE: /run/secrets/aws_access_key_id
+      AWS_SECRET_ACCESS_KEY_FILE: /run/secrets/aws_secret_access_key
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD_FILE: /run/secrets/db_password
+      YACLOUD_ENDPOINT: ${YACLOUD_ENDPOINT}
+      YACLOUD_REGION: ${YACLOUD_REGION}
+      YACLOUD_BUCKET_NAME: ${YACLOUD_BUCKET_NAME}
+    expose:
+      - "8080"
+    secrets:
+      - aws_access_key_id
+      - aws_secret_access_key
+      - db_password
+    networks:
+      - frontend
+      - backend
+    restart: always
+  db:
+    image: postgres:16.3
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - ${DB_DATA_FOLDER}:/var/lib/postgresql/data
+      - ${DB_INIT_SCRIPT_FILE}:/docker-entrypoint-initdb.d/init.sql
+    expose:
+      - "5432"
+    secrets:
+      - db_password
+    networks:
+      - backend
+    restart: always
+
+secrets:
+  aws_access_key_id:
+    file: ${AWS_ACCESS_KEY_ID_FILE}
+  aws_secret_access_key:
+    file: ${AWS_SECRET_ACCESS_KEY_FILE}
+  db_password:
+    file: ${DB_PASSWORD_FILE}
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge

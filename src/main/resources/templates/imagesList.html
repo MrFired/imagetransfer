@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="ru">
+<div th:replace="~{fragments/head :: head}"></div>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="mx-auto pt-2 px-3" style="max-width: 800px;">
+    <h1>Список всех изображений</h1>
+
+    <div th:class="'alert alert-dismissible text-break fade show alert-' + ${status}" role="alert" th:if="${status}">
+        <strong>[[${message}]]</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+    </div>
+
+    <table th:unless="${images.isEmpty()}" class="table table-striped table-hover align-middle">
+        <tbody>
+        <tr th:each="image : ${images}">
+            <td class="col text-break"><a th:href="@{'/content/preview/' + ${image.getName()}}" th:text="${image.getName()}"></a></td>
+            <td class="col-3 text-break">[[${image.getUserUploaded()}]]</td>
+            <td class="col-1">[[${image.getFormattedUploadTimestamp()}]]</td>
+            <td class="col-md-auto text-center"><a th:href="@{'/content/' + ${image.getName()}}" title="Download" class="text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+            </a></td>
+            <td class="col-md-auto text-center"><a th:href="@{'/delete/' + ${image.getName()}}" th:fileName="${image.getName()}" id="btnDelete"
+                   title="Delete" class="btn-delete text-decoration-none text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>
+            </a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${images.isEmpty()}">
+        <span>Изображения не найдены.</span>
+    </div>
+
+    <nav th:unless="${images.isEmpty()}" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{'/list?page=1&size=' + ${pageSize}}" aria-label="First">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{'/list?page=' + ${currentPage - 1} + '&size=' + ${pageSize}}" aria-label="Previous">
+                    <span aria-hidden="true">&lt;</span>
+                </a>
+            </li>
+            <div th:if="${totalPages - currentPage < 1}"><div th:replace="~{fragments/pageItem :: pageItem (${currentPage - 4},${currentPage},${totalPages},${pageSize})}"></div></div>
+            <div th:if="${totalPages - currentPage < 2}"><div th:replace="~{fragments/pageItem :: pageItem (${currentPage - 3},${currentPage},${totalPages},${pageSize})}"></div></div>
+            <div th:replace="~{fragments/pageItem :: pageItem (${currentPage - 2},${currentPage},${totalPages},${pageSize})}"></div>
+            <div th:replace="~{fragments/pageItem :: pageItem (${currentPage - 1},${currentPage},${totalPages},${pageSize})}"></div>
+            <div th:replace="~{fragments/pageItem :: pageItem (${currentPage},${currentPage},${totalPages},${pageSize})}"></div>
+            <div th:replace="~{fragments/pageItem :: pageItem (${currentPage + 1},${currentPage},${totalPages},${pageSize})}"></div>
+            <div th:replace="~{fragments/pageItem :: pageItem (${currentPage + 2},${currentPage},${totalPages},${pageSize})}"></div>
+            <div th:if="${currentPage < 3}"><div th:replace="~{fragments/pageItem :: pageItem (${currentPage + 3},${currentPage},${totalPages},${pageSize})}"></div></div>
+            <div th:if="${currentPage < 2}"><div th:replace="~{fragments/pageItem :: pageItem (${currentPage + 4},${currentPage},${totalPages},${pageSize})}"></div></div>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{'/list?page=' + ${currentPage + 1} + '&size=' + ${pageSize}}" aria-label="Next">
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{'/list?page=' + ${totalPages} + '&size=' + ${pageSize}}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="modal fade text-center" id="confirmModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтвердите удаление</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+
+            <div class="modal-body">
+                <span class="text-break" id="confirmText"></span>
+            </div>
+
+            <div class="modal-footer">
+                <a type="button" id="yesBtn" class="btn btn-danger">Удалить</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+      $(".btn-delete").on("click", function (e) {
+        e.preventDefault();
+        link = $(this);
+
+        fileName = link.attr("fileName");
+        $("#yesBtn").attr("href", link.attr("href"));
+        $("#confirmText").html("Удалить изображение: \<strong\>" + fileName + "\<\/strong\>?");
+        $("#confirmModal").modal("show");
+      });
+    });
+</script>
+
+</body>
+</html>
